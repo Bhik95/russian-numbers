@@ -14,9 +14,19 @@
         private static readonly string[] millionWordCases = ["миллио́н", "миллио́на", "миллио́нов"];
         private static readonly string[] billionWordCases = ["миллиа́рд", "миллиа́рда", "миллиа́рдов"];
 
-        public static string GetRussianNumberString(long n, GenderNumber genderNumber)
+        public static string GetRussianNumberString(long n, GenderNumber genderNumber, bool includeStressMarks)
         {
-            if (n < 0) return "минус " + GetRussianNumberString(-n, genderNumber);
+            string result = GetRussianNumberString_Internal(n, genderNumber);
+
+            if(!includeStressMarks)
+                result = result.Replace("́", "");
+
+            return result;
+        }
+
+        private static string GetRussianNumberString_Internal(long n, GenderNumber genderNumber)
+        {
+            if (n < 0) return "ми́нус " + GetRussianNumberString_Internal(-n, genderNumber);
 
             return GetD10toD12(n, genderNumber);
         }
