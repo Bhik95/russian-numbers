@@ -19,7 +19,7 @@ internal class Program
 
         if(args.Length == 1)
         {
-            PrintFromNumberOrRange(args[0], GenderNumber.Masculine, true);
+            ProcessInputLine(args[0], GenderNumber.Masculine, true);
             return 0;
         }
 
@@ -54,7 +54,7 @@ internal class Program
         } while (!Enum.TryParse(line, out genderNumber));
 
 
-        Console.WriteLine("Type a number or range [-4..10] to get it in Russian");
+        Console.WriteLine("Type a number or range [-4..10] to get it in Russian. Or write \"challenge\" if you want to test your knowledge!");
         do
         {
             line = Console.ReadLine();
@@ -62,16 +62,20 @@ internal class Program
             if (line == null)
                 return -3;
 
-            PrintFromNumberOrRange(line, genderNumber, useStressMarkers.Value);
+            ProcessInputLine(line, genderNumber, useStressMarkers.Value);
 
         } while (line != null);
 
         return 0;
     }
 
-    private static void PrintFromNumberOrRange(string line, GenderNumber genderNumber, bool includeStressMarkers)
+    private static void ProcessInputLine(string line, GenderNumber genderNumber, bool includeStressMarkers)
     {
-        if (long.TryParse(line, out long number))
+        if (line.Equals("challenge"))
+        {
+            Challenge(genderNumber, includeStressMarkers);
+        }
+        else if (long.TryParse(line, out long number))
         {
             Console.WriteLine(RussianNumberUtils.GetRussianNumberString(number, genderNumber, includeStressMarkers));
         }
@@ -102,6 +106,51 @@ internal class Program
         {
             Console.WriteLine("Not valid number.");
         }
+    }
+
+    private static void Challenge(GenderNumber genderNumber, bool includeStressMark)
+    {
+        Console.WriteLine("Challenge accepted. Let's test your knowledge.");
+
+        string? line = null;
+
+        long nMin = 0;
+        do
+        {
+            Console.WriteLine("Enter the minimum number:");
+            line = Console.ReadLine();
+            if (long.TryParse(line, out nMin))
+            {
+                break;
+            }
+        } while (true);
+
+        long nMax = 0;
+        do
+        {
+            Console.WriteLine("Enter the maximum number:");
+            line = Console.ReadLine();
+            if (long.TryParse(line, out nMax))
+            {
+                break;
+            }
+        } while (true);
+
+        Random r = new Random(HashCode.Combine(DateTime.UtcNow.Ticks));
+
+        Console.WriteLine("Try to read the following numbers. Press enter to continue or type \"exit\" to exit.");
+        do
+        {
+            long n = r.NextInt64(nMin, nMax + 1);
+            Console.WriteLine(n);
+            
+            line = Console.ReadLine();
+
+            Console.WriteLine(RussianNumberUtils.GetRussianNumberString(n, genderNumber, includeStressMark));
+
+        } while (line != "exit");
+
+        Console.WriteLine("Exited challenge.");
     }
 
     private static void PrintUsage()
