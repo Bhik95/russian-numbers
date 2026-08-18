@@ -5,7 +5,7 @@ namespace RussianNumbers;
 
 internal static class Program
 {
-    private static readonly Regex RangeRegex = new Regex(@"^(\-?\d+)\.\.(\-?\d+)$"); //-1..10 -> a=-1, b=10 | 3..4 -> a=3, b=4
+    private static readonly Regex RangeRegex = new(@"^(\-?\d+)\.\.(\-?\d+)$"); //-1..10 -> a=-1, b=10 | 3..4 -> a=3, b=4
 
     private static int Main(string[] args)
     {
@@ -17,10 +17,10 @@ internal static class Program
             PrintUsage();
             return -1;
         }
-
+        
         if(args.Length == 1)
         {
-            ProcessInputLine(args[0], GenderNumber.Masculine, true);
+            ProcessInputLine(args[0], new RussianNumberWriter());
             return 0;
         }
 
@@ -54,7 +54,12 @@ internal static class Program
                 line = nameof(GenderNumber.Masculine);
         } while (!Enum.TryParse(line, out genderNumber));
 
-
+        RussianNumberWriter writer = new RussianNumberWriter()
+        {
+            GenderNumber = genderNumber,
+            IncludeStressMarks = useStressMarkers.Value
+        };
+        
         Console.WriteLine("Type a number or range [-4..10] to get it in Russian. Or write \"challenge\" if you want to test your knowledge!");
         do
         {
@@ -63,20 +68,20 @@ internal static class Program
             if (line == null)
                 return -3;
 
-            ProcessInputLine(line, genderNumber, useStressMarkers.Value);
+            ProcessInputLine(line, writer);
 
         } while (true);
     }
 
-    private static void ProcessInputLine(string line, GenderNumber genderNumber, bool includeStressMarkers)
+    private static void ProcessInputLine(string line, RussianNumberWriter writer)
     {
         if (line.Equals("challenge"))
         {
-            Challenge(genderNumber, includeStressMarkers);
+            Challenge(writer);
         }
         else if (long.TryParse(line, out long number))
         {
-            Console.WriteLine(RussianNumberUtils.GetRussianNumberString(number, genderNumber, includeStressMarkers));
+            Console.WriteLine(writer.Write(number));
         }
         else if (RangeRegex.IsMatch(line))
         {
@@ -89,14 +94,14 @@ internal static class Program
             {
                 for (long i = nStart; i <= nEnd; i++)
                 {
-                    Console.WriteLine(RussianNumberUtils.GetRussianNumberString(i, genderNumber, includeStressMarkers));
+                    Console.WriteLine(writer.Write(i));
                 }
             }
             else
             {
                 for (long i = nStart; i >= nEnd; i--)
                 {
-                    Console.WriteLine(RussianNumberUtils.GetRussianNumberString(i, genderNumber, includeStressMarkers));
+                    Console.WriteLine(writer.Write(i));
                 }
             }
 
@@ -107,7 +112,7 @@ internal static class Program
         }
     }
 
-    private static void Challenge(GenderNumber genderNumber, bool includeStressMark)
+    private static void Challenge(RussianNumberWriter writer)
     {
         Console.WriteLine("Challenge accepted. Let's test your knowledge.");
 
@@ -145,7 +150,7 @@ internal static class Program
             
             line = Console.ReadLine();
 
-            Console.WriteLine(RussianNumberUtils.GetRussianNumberString(n, genderNumber, includeStressMark));
+            Console.WriteLine(writer.Write(n));
 
         } while (line != "exit");
 
