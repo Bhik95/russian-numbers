@@ -1,10 +1,11 @@
-﻿using RussianNumbers;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
-internal class Program
+namespace RussianNumbers;
+
+internal static class Program
 {
-    private static Regex _rangeRegex = new Regex(@"^(\-?\d+)\.\.(\-?\d+)$"); //-1..10 -> a=-1, b=10 | 3..4 -> a=3, b=4
+    private static readonly Regex RangeRegex = new Regex(@"^(\-?\d+)\.\.(\-?\d+)$"); //-1..10 -> a=-1, b=10 | 3..4 -> a=3, b=4
 
     private static int Main(string[] args)
     {
@@ -50,7 +51,7 @@ internal class Program
                 return -2;
 
             if (string.IsNullOrWhiteSpace(line))
-                line = GenderNumber.Masculine.ToString();
+                line = nameof(GenderNumber.Masculine);
         } while (!Enum.TryParse(line, out genderNumber));
 
 
@@ -64,9 +65,7 @@ internal class Program
 
             ProcessInputLine(line, genderNumber, useStressMarkers.Value);
 
-        } while (line != null);
-
-        return 0;
+        } while (true);
     }
 
     private static void ProcessInputLine(string line, GenderNumber genderNumber, bool includeStressMarkers)
@@ -79,9 +78,9 @@ internal class Program
         {
             Console.WriteLine(RussianNumberUtils.GetRussianNumberString(number, genderNumber, includeStressMarkers));
         }
-        else if (_rangeRegex.IsMatch(line))
+        else if (RangeRegex.IsMatch(line))
         {
-            var match = _rangeRegex.Match(line);
+            var match = RangeRegex.Match(line);
 
             long nStart = long.Parse(match.Groups[1].Value);
             long nEnd = long.Parse(match.Groups[2].Value);
@@ -112,9 +111,9 @@ internal class Program
     {
         Console.WriteLine("Challenge accepted. Let's test your knowledge.");
 
-        string? line = null;
+        string? line;
 
-        long nMin = 0;
+        long nMin;
         do
         {
             Console.WriteLine("Enter the minimum number:");
@@ -125,7 +124,7 @@ internal class Program
             }
         } while (true);
 
-        long nMax = 0;
+        long nMax;
         do
         {
             Console.WriteLine("Enter the maximum number:");
