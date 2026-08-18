@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using RussianNumbers;
 
-namespace RussianNumbers;
+namespace RussianNumbersConsole;
 
 internal static class Program
 {
@@ -104,7 +105,6 @@ internal static class Program
                     Console.WriteLine(writer.Write(i));
                 }
             }
-
         }
         else
         {
